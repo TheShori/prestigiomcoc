@@ -41,7 +41,7 @@
     </div>
 
     <div class="flex items-center gap-2.5">
-      <!-- BOTÓN PANEL DE ANALÍTICAS (SOLO ADMIN) -->
+      <!-- BOTÓN PANEL DE ANALÍTICAS UNIFICADO (SOLO ADMIN) -->
       <button id="btnAnalytics" onclick="openAnalyticsModal()" class="hidden bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold px-3.5 py-1.5 rounded-lg text-xs md:text-sm transition shadow-lg">
         📊 Analíticas
       </button>
@@ -109,33 +109,36 @@
     </div>
   </div>
 
-  <!-- MODAL PANEL DE CONTROL DE ANALÍTICAS (SOLO ADMIN) -->
+  <!-- MODAL PANEL DE CONTROL DE ANALÍTICAS UNIFICADO (IDÉNTICO EN AMBOS PROYECTOS) -->
   <div id="analyticsModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-4">
     <div class="bg-gray-900 border border-gray-700 rounded-2xl max-w-4xl w-full p-6 shadow-2xl max-h-[90vh] flex flex-col">
       <div class="flex justify-between items-center mb-4 border-b border-gray-800 pb-3 flex-shrink-0">
         <div>
           <h3 class="text-lg md:text-xl font-extrabold text-indigo-400 flex items-center gap-2">
-            📊 Panel de Control y Analíticas (Prestigio)
+            📊 Panel de Control Unificado (Tier List + Prestigio)
           </h3>
-          <p class="text-xs text-gray-400">Estadísticas en tiempo real de tus visitantes (tus propios clics como Admin no se cuentan).</p>
+          <p class="text-xs text-gray-400">Estadísticas globales en tiempo real compartidas entre ambas páginas (tus propios clics como Admin no se cuentan).</p>
         </div>
         <button onclick="closeAnalyticsModal()" class="text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
       </div>
 
       <div class="overflow-y-auto flex-1 space-y-6 pr-1">
-        <!-- Tarjetas de Resumen (KPIs) -->
+        <!-- Tarjetas de Resumen (KPIs Unificados) -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div class="bg-gray-950/90 border border-gray-800 p-4 rounded-xl">
             <span class="text-[11px] font-bold uppercase text-gray-400 block">👀 Visitas Totales</span>
             <span id="statTotalVisits" class="text-2xl font-extrabold text-white font-mono mt-1 block">0</span>
+            <span id="statVisitsBreakdown" class="text-[10px] text-gray-400 mt-1 block">Tier List: 0 | Prestigio: 0</span>
           </div>
           <div class="bg-gray-950/90 border border-gray-800 p-4 rounded-xl">
             <span class="text-[11px] font-bold uppercase text-purple-400 block">🃏 Clics en Personajes</span>
             <span id="statTotalCharClicks" class="text-2xl font-extrabold text-purple-300 font-mono mt-1 block">0</span>
+            <span class="text-[10px] text-gray-500 mt-1 block">Fichas abiertas en total</span>
           </div>
           <div class="bg-gray-950/90 border border-gray-800 p-4 rounded-xl">
             <span class="text-[11px] font-bold uppercase text-red-400 block">▶️ Clics a YouTube</span>
             <span id="statTotalYtClicks" class="text-2xl font-extrabold text-red-400 font-mono mt-1 block">0</span>
+            <span class="text-[10px] text-gray-500 mt-1 block">Visitas enviadas al canal</span>
           </div>
           <div class="bg-gray-950/90 border border-gray-800 p-4 rounded-xl">
             <span class="text-[11px] font-bold uppercase text-amber-400 block">🕒 Última Actividad</span>
@@ -145,27 +148,25 @@
 
         <!-- Tablas de Rankings de Interacción -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Top Personajes Más Consultados -->
           <div class="bg-gray-950/70 border border-gray-800 rounded-xl p-4">
             <h4 class="text-xs font-extrabold uppercase tracking-wider text-purple-400 mb-3">
-              🔥 Top Personajes Más Pinchados
+              🔥 Top Personajes Más Pinchados (Global)
             </h4>
             <div id="statTopCharsList" class="space-y-2 max-h-60 overflow-y-auto pr-1 text-xs"></div>
           </div>
 
-          <!-- Top Vídeos de YouTube Más Abiertos -->
           <div class="bg-gray-950/70 border border-gray-800 rounded-xl p-4">
             <h4 class="text-xs font-extrabold uppercase tracking-wider text-red-400 mb-3">
-              ▶️ Top Vídeos de YouTube Más Visitados
+              ▶️ Top Vídeos de YouTube Más Visitados (Global)
             </h4>
             <div id="statTopYtList" class="space-y-2 max-h-60 overflow-y-auto pr-1 text-xs"></div>
           </div>
         </div>
 
-        <!-- Filtros Más Utilizados -->
+        <!-- Filtros, Etiquetas y Rangos Más Utilizados -->
         <div class="bg-gray-950/70 border border-gray-800 rounded-xl p-4">
           <h4 class="text-xs font-extrabold uppercase tracking-wider text-amber-400 mb-3">
-            🎛️ Rangos y Clases Más Consultados
+            🎛️ Filtros, Etiquetas y Rangos Más Consultados (Global)
           </h4>
           <div id="statTopFiltersList" class="flex flex-wrap gap-2 text-xs"></div>
         </div>
@@ -173,7 +174,7 @@
 
       <div class="flex justify-between items-center pt-4 border-t border-gray-800 mt-4 flex-shrink-0">
         <button onclick="resetAnalyticsStats()" class="text-xs text-red-400 hover:text-red-300 underline">
-          🗑️ Reiniciar contadores a cero
+          🗑️ Reiniciar contadores globales a cero
         </button>
         <div class="flex gap-2">
           <button onclick="loadAnalyticsData()" class="px-3.5 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold text-xs">
@@ -297,7 +298,7 @@
     </div>
   </div>
 
-  <!-- MODAL DETALLE DE PERSONAJE (CON VÍDEO YOUTUBE Y RASTREO DE CLICS) -->
+  <!-- MODAL DETALLE DE PERSONAJE -->
   <div id="detailModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-4">
     <div class="bg-gray-900 border border-gray-700 rounded-2xl max-w-xl w-full overflow-hidden shadow-2xl">
       <div class="p-5 border-b border-gray-800 flex justify-between items-start">
@@ -322,7 +323,6 @@
           <p id="detailNotes" class="text-gray-200 text-sm whitespace-pre-line bg-gray-950/70 p-3.5 rounded-xl border border-gray-800"></p>
         </div>
 
-        <!-- SECCIÓN DE VÍDEO DE YOUTUBE CON TRACKING DE CLICS -->
         <div id="detailVideoSection" class="hidden space-y-2">
           <h4 class="text-xs font-bold uppercase tracking-wider text-red-400">Análisis en YouTube</h4>
           <a id="detailYoutubeBtn" href="#" target="_blank" class="block group relative rounded-xl overflow-hidden border border-gray-800 shadow-lg bg-black">
@@ -779,16 +779,15 @@
     let isAdmin = false;
 
     // =========================================================================
-    // SISTEMA DE ANALÍTICAS Y MONITORIZACIÓN EN FIREBASE (analytics/prestigio_stats)
+    // SISTEMA DE ANALÍTICAS UNIFICADO EN FIREBASE (analytics/global_stats)
     // =========================================================================
-    const statsDocRef = db.collection('analytics').doc('prestigio_stats');
+    const statsDocRef = db.collection('analytics').doc('global_stats');
 
     function sanitizeKey(str) {
       return (str || 'unknown').replace(/[\.\$\[\]\#\/]/g, '_');
     }
 
     function trackEvent(type, label = '') {
-      // No contabilizar los clics del propio administrador
       if (isAdmin) return;
 
       const inc = firebase.firestore.FieldValue.increment(1);
@@ -800,6 +799,7 @@
         if (sessionStorage.getItem('shori_prestigio_visited')) return;
         sessionStorage.setItem('shori_prestigio_visited', '1');
         updateData.totalVisits = inc;
+        updateData.visitsPrestigio = inc;
       } else if (type === 'char_click') {
         updateData.totalCharClicks = inc;
         updateData[`charClicks.${sanitizeKey(label)}`] = inc;
@@ -842,7 +842,12 @@
       statsDocRef.get().then(doc => {
         const data = doc.exists ? doc.data() : {};
 
-        document.getElementById('statTotalVisits').innerText = (data.totalVisits || 0).toLocaleString('es-ES');
+        const vTier = Number(data.visitsTierList || 0);
+        const vPres = Number(data.visitsPrestigio || 0);
+        const vTotal = Number(data.totalVisits || (vTier + vPres));
+
+        document.getElementById('statTotalVisits').innerText = vTotal.toLocaleString('es-ES');
+        document.getElementById('statVisitsBreakdown').innerText = `Tier List: ${vTier.toLocaleString('es-ES')} | Prestigio: ${vPres.toLocaleString('es-ES')}`;
         document.getElementById('statTotalCharClicks').innerText = (data.totalCharClicks || 0).toLocaleString('es-ES');
         document.getElementById('statTotalYtClicks').innerText = (data.totalYtClicks || 0).toLocaleString('es-ES');
 
@@ -852,7 +857,6 @@
           document.getElementById('statLastUpdated').innerText = 'Sin actividad aún';
         }
 
-        // Top Personajes Pinchados
         const charMap = flattenObjectCounters(data, 'charClicks');
         const sortedChars = Object.entries(charMap).sort((a, b) => b[1] - a[1]);
         const charListEl = document.getElementById('statTopCharsList');
@@ -865,7 +869,6 @@
               </div>
             `).join('');
 
-        // Top Vídeos de YouTube Visitados
         const ytMap = flattenObjectCounters(data, 'ytClicks');
         const sortedYt = Object.entries(ytMap).sort((a, b) => b[1] - a[1]);
         const ytListEl = document.getElementById('statTopYtList');
@@ -878,7 +881,6 @@
               </div>
             `).join('');
 
-        // Top Filtros Usados
         const filterMap = flattenObjectCounters(data, 'filterUses');
         const sortedFilters = Object.entries(filterMap).sort((a, b) => b[1] - a[1]);
         const filterListEl = document.getElementById('statTopFiltersList');
@@ -893,7 +895,7 @@
     }
 
     function resetAnalyticsStats() {
-      if (!confirm('¿Seguro que quieres borrar todas las estadísticas de Prestigio y empezar desde cero?')) return;
+      if (!confirm('¿Seguro que quieres borrar todas las estadísticas globales (Tier List + Prestigio) y empezar desde cero?')) return;
       statsDocRef.delete().then(() => {
         loadAnalyticsData();
       });
@@ -901,13 +903,13 @@
 
     function handleSortChange(val) {
       const labelMap = {
-        'cascade_r5a2': 'Todos (Cascada)',
-        'r5_a2': 'Rango 7★ R5 Asc 2',
-        'r5_a1': 'Rango 7★ R5 Asc 1',
-        'r5_base': 'Rango 7★ R5',
-        'r4_a2': 'Rango 7★ R4 Asc 2',
-        'r4_a1': 'Rango 7★ R4 Asc 1',
-        'r4_base': 'Rango 7★ R4'
+        'cascade_r5a2': 'Prestigio: Todos (Cascada)',
+        'r5_a2': 'Prestigio: 7★ R5 Asc 2',
+        'r5_a1': 'Prestigio: 7★ R5 Asc 1',
+        'r5_base': 'Prestigio: 7★ R5',
+        'r4_a2': 'Prestigio: 7★ R4 Asc 2',
+        'r4_a1': 'Prestigio: 7★ R4 Asc 1',
+        'r4_base': 'Prestigio: 7★ R4'
       };
       trackEvent('filter_use', labelMap[val] || val);
       renderPrestigeView();
@@ -1197,7 +1199,7 @@
       allBtn.innerText = 'Todas las Clases';
       allBtn.onclick = () => {
         activePrestigeClass = 'ALL';
-        trackEvent('filter_use', 'Clase: Todas');
+        trackEvent('filter_use', 'Prestigio Clase: Todas');
         renderPrestigeView();
       };
       classBar.appendChild(allBtn);
@@ -1209,7 +1211,7 @@
         btn.innerText = cl.label;
         btn.onclick = () => {
           activePrestigeClass = cl.id;
-          trackEvent('filter_use', `Clase: ${cl.id}`);
+          trackEvent('filter_use', `Prestigio Clase: ${cl.id}`);
           renderPrestigeView();
         };
         classBar.appendChild(btn);
@@ -1451,7 +1453,6 @@
       const ch = characters.find(c => c.id === charId);
       if (!ch) return;
 
-      // Registrar clic en el personaje para las analíticas
       trackEvent('char_click', ch.name);
 
       document.getElementById('detailName').innerText = ch.name;
@@ -1469,7 +1470,6 @@
         <div class="bg-gray-900 p-2 rounded border border-gray-800"><span class="text-gray-400 block text-[10px]">7★ Rango 4 (x200)</span><strong class="text-sky-300 font-mono">${p.r4_base ? p.r4_base.toLocaleString('es-ES') : '—'}</strong></div>
       `;
 
-      // Mostrar vídeo de YouTube y registrar clic si el usuario pulsa para verlo
       const videoSection = document.getElementById('detailVideoSection');
       const ytBtn = document.getElementById('detailYoutubeBtn');
       const ytThumb = document.getElementById('detailYoutubeThumb');
