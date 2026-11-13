@@ -41,6 +41,11 @@
     </div>
 
     <div class="flex items-center gap-2.5">
+      <!-- BOTÓN PANEL DE ANALÍTICAS (SOLO ADMIN) -->
+      <button id="btnAnalytics" onclick="openAnalyticsModal()" class="hidden bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold px-3.5 py-1.5 rounded-lg text-xs md:text-sm transition shadow-lg">
+        📊 Analíticas
+      </button>
+
       <button id="btnAutoFillPrestige" onclick="autoFillOfficialPrestige()" class="hidden bg-amber-500 hover:bg-amber-400 text-black font-extrabold px-3.5 py-1.5 rounded-lg text-xs md:text-sm transition shadow-lg">
         ⚡ Auto-Rellenar Prestigios (1-Clic)
       </button>
@@ -72,7 +77,7 @@
 
           <div class="flex flex-wrap items-center gap-2">
             <span class="text-xs font-bold text-gray-400 uppercase">Ver Rango:</span>
-            <select id="prestigeSortSelect" onchange="renderPrestigeView()" class="bg-gray-950 border border-amber-500/50 rounded-xl px-3 py-2 text-xs font-bold text-amber-300 focus:outline-none">
+            <select id="prestigeSortSelect" onchange="handleSortChange(this.value)" class="bg-gray-950 border border-amber-500/50 rounded-xl px-3 py-2 text-xs font-bold text-amber-300 focus:outline-none">
               <option value="cascade_r5a2">Todos los Prestigios (Cascada R5 Asc 2 ➔ R4)</option>
               <option value="r5_a2">Exclusivo: 7★ Rango 5 - Ascensión 2 (x200)</option>
               <option value="r5_a1">Exclusivo: 7★ Rango 5 - Ascensión 1 (x200)</option>
@@ -101,6 +106,84 @@
         </div>
       </div>
 
+    </div>
+  </div>
+
+  <!-- MODAL PANEL DE CONTROL DE ANALÍTICAS (SOLO ADMIN) -->
+  <div id="analyticsModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-4">
+    <div class="bg-gray-900 border border-gray-700 rounded-2xl max-w-4xl w-full p-6 shadow-2xl max-h-[90vh] flex flex-col">
+      <div class="flex justify-between items-center mb-4 border-b border-gray-800 pb-3 flex-shrink-0">
+        <div>
+          <h3 class="text-lg md:text-xl font-extrabold text-indigo-400 flex items-center gap-2">
+            📊 Panel de Control y Analíticas (Prestigio)
+          </h3>
+          <p class="text-xs text-gray-400">Estadísticas en tiempo real de tus visitantes (tus propios clics como Admin no se cuentan).</p>
+        </div>
+        <button onclick="closeAnalyticsModal()" class="text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
+      </div>
+
+      <div class="overflow-y-auto flex-1 space-y-6 pr-1">
+        <!-- Tarjetas de Resumen (KPIs) -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="bg-gray-950/90 border border-gray-800 p-4 rounded-xl">
+            <span class="text-[11px] font-bold uppercase text-gray-400 block">👀 Visitas Totales</span>
+            <span id="statTotalVisits" class="text-2xl font-extrabold text-white font-mono mt-1 block">0</span>
+          </div>
+          <div class="bg-gray-950/90 border border-gray-800 p-4 rounded-xl">
+            <span class="text-[11px] font-bold uppercase text-purple-400 block">🃏 Clics en Personajes</span>
+            <span id="statTotalCharClicks" class="text-2xl font-extrabold text-purple-300 font-mono mt-1 block">0</span>
+          </div>
+          <div class="bg-gray-950/90 border border-gray-800 p-4 rounded-xl">
+            <span class="text-[11px] font-bold uppercase text-red-400 block">▶️ Clics a YouTube</span>
+            <span id="statTotalYtClicks" class="text-2xl font-extrabold text-red-400 font-mono mt-1 block">0</span>
+          </div>
+          <div class="bg-gray-950/90 border border-gray-800 p-4 rounded-xl">
+            <span class="text-[11px] font-bold uppercase text-amber-400 block">🕒 Última Actividad</span>
+            <span id="statLastUpdated" class="text-xs font-bold text-amber-300 mt-2 block">—</span>
+          </div>
+        </div>
+
+        <!-- Tablas de Rankings de Interacción -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Top Personajes Más Consultados -->
+          <div class="bg-gray-950/70 border border-gray-800 rounded-xl p-4">
+            <h4 class="text-xs font-extrabold uppercase tracking-wider text-purple-400 mb-3">
+              🔥 Top Personajes Más Pinchados
+            </h4>
+            <div id="statTopCharsList" class="space-y-2 max-h-60 overflow-y-auto pr-1 text-xs"></div>
+          </div>
+
+          <!-- Top Vídeos de YouTube Más Abiertos -->
+          <div class="bg-gray-950/70 border border-gray-800 rounded-xl p-4">
+            <h4 class="text-xs font-extrabold uppercase tracking-wider text-red-400 mb-3">
+              ▶️ Top Vídeos de YouTube Más Visitados
+            </h4>
+            <div id="statTopYtList" class="space-y-2 max-h-60 overflow-y-auto pr-1 text-xs"></div>
+          </div>
+        </div>
+
+        <!-- Filtros Más Utilizados -->
+        <div class="bg-gray-950/70 border border-gray-800 rounded-xl p-4">
+          <h4 class="text-xs font-extrabold uppercase tracking-wider text-amber-400 mb-3">
+            🎛️ Rangos y Clases Más Consultados
+          </h4>
+          <div id="statTopFiltersList" class="flex flex-wrap gap-2 text-xs"></div>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center pt-4 border-t border-gray-800 mt-4 flex-shrink-0">
+        <button onclick="resetAnalyticsStats()" class="text-xs text-red-400 hover:text-red-300 underline">
+          🗑️ Reiniciar contadores a cero
+        </button>
+        <div class="flex gap-2">
+          <button onclick="loadAnalyticsData()" class="px-3.5 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold text-xs">
+            🔄 Actualizar Datos
+          </button>
+          <button onclick="closeAnalyticsModal()" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs">
+            Cerrar
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -196,6 +279,16 @@
           </div>
         </div>
 
+        <div>
+          <label class="block text-gray-300 mb-1 font-medium">Características / Rotación / Notas</label>
+          <textarea id="charNotes" rows="2" placeholder="Detalles sobre su rotación, reliquia ideal..." class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-gray-300 mb-1 font-medium">Enlace a tu Vídeo de YouTube</label>
+          <input type="url" id="charYoutube" placeholder="https://www.youtube.com/watch?v=..." class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white">
+        </div>
+
         <div class="flex justify-end gap-2 pt-2">
           <button type="button" onclick="closeFormModal()" class="px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300">Cancelar</button>
           <button type="submit" class="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-semibold">Guardar Personaje</button>
@@ -204,7 +297,7 @@
     </div>
   </div>
 
-  <!-- MODAL DETALLE DE PERSONAJE -->
+  <!-- MODAL DETALLE DE PERSONAJE (CON VÍDEO YOUTUBE Y RASTREO DE CLICS) -->
   <div id="detailModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-4">
     <div class="bg-gray-900 border border-gray-700 rounded-2xl max-w-xl w-full overflow-hidden shadow-2xl">
       <div class="p-5 border-b border-gray-800 flex justify-between items-start">
@@ -227,6 +320,22 @@
         <div>
           <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">Características y Análisis</h4>
           <p id="detailNotes" class="text-gray-200 text-sm whitespace-pre-line bg-gray-950/70 p-3.5 rounded-xl border border-gray-800"></p>
+        </div>
+
+        <!-- SECCIÓN DE VÍDEO DE YOUTUBE CON TRACKING DE CLICS -->
+        <div id="detailVideoSection" class="hidden space-y-2">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-red-400">Análisis en YouTube</h4>
+          <a id="detailYoutubeBtn" href="#" target="_blank" class="block group relative rounded-xl overflow-hidden border border-gray-800 shadow-lg bg-black">
+            <div class="aspect-video w-full relative">
+              <img id="detailYoutubeThumb" src="" alt="Miniatura YouTube" class="w-full h-full object-cover group-hover:scale-105 transition duration-200">
+              <div class="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/20 transition">
+                <div class="bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-xs flex items-center gap-2 shadow-lg">
+                  <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                  <span>Ver en YouTube</span>
+                </div>
+              </div>
+            </div>
+          </a>
         </div>
 
         <div id="adminActionsContainer" class="hidden pt-3 border-t border-gray-800 flex justify-between items-center">
@@ -669,6 +778,144 @@
     let activePrestigeClass = 'ALL';
     let isAdmin = false;
 
+    // =========================================================================
+    // SISTEMA DE ANALÍTICAS Y MONITORIZACIÓN EN FIREBASE (analytics/prestigio_stats)
+    // =========================================================================
+    const statsDocRef = db.collection('analytics').doc('prestigio_stats');
+
+    function sanitizeKey(str) {
+      return (str || 'unknown').replace(/[\.\$\[\]\#\/]/g, '_');
+    }
+
+    function trackEvent(type, label = '') {
+      // No contabilizar los clics del propio administrador
+      if (isAdmin) return;
+
+      const inc = firebase.firestore.FieldValue.increment(1);
+      const updateData = {
+        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      if (type === 'visit') {
+        if (sessionStorage.getItem('shori_prestigio_visited')) return;
+        sessionStorage.setItem('shori_prestigio_visited', '1');
+        updateData.totalVisits = inc;
+      } else if (type === 'char_click') {
+        updateData.totalCharClicks = inc;
+        updateData[`charClicks.${sanitizeKey(label)}`] = inc;
+      } else if (type === 'yt_click') {
+        updateData.totalYtClicks = inc;
+        updateData[`ytClicks.${sanitizeKey(label)}`] = inc;
+      } else if (type === 'filter_use') {
+        updateData[`filterUses.${sanitizeKey(label)}`] = inc;
+      }
+
+      statsDocRef.set(updateData, { merge: true }).catch(() => {});
+    }
+
+    function openAnalyticsModal() {
+      document.getElementById('analyticsModal').classList.remove('hidden');
+      document.getElementById('analyticsModal').classList.add('flex');
+      loadAnalyticsData();
+    }
+
+    function closeAnalyticsModal() {
+      document.getElementById('analyticsModal').classList.add('hidden');
+      document.getElementById('analyticsModal').classList.remove('flex');
+    }
+
+    function flattenObjectCounters(dataObj, prefix) {
+      const result = {};
+      if (dataObj[prefix] && typeof dataObj[prefix] === 'object') {
+        Object.assign(result, dataObj[prefix]);
+      }
+      Object.keys(dataObj).forEach(k => {
+        if (k.startsWith(prefix + '.')) {
+          const subKey = k.slice(prefix.length + 1);
+          result[subKey] = (result[subKey] || 0) + Number(dataObj[k] || 0);
+        }
+      });
+      return result;
+    }
+
+    function loadAnalyticsData() {
+      statsDocRef.get().then(doc => {
+        const data = doc.exists ? doc.data() : {};
+
+        document.getElementById('statTotalVisits').innerText = (data.totalVisits || 0).toLocaleString('es-ES');
+        document.getElementById('statTotalCharClicks').innerText = (data.totalCharClicks || 0).toLocaleString('es-ES');
+        document.getElementById('statTotalYtClicks').innerText = (data.totalYtClicks || 0).toLocaleString('es-ES');
+
+        if (data.lastUpdated && data.lastUpdated.toDate) {
+          document.getElementById('statLastUpdated').innerText = data.lastUpdated.toDate().toLocaleString('es-ES');
+        } else {
+          document.getElementById('statLastUpdated').innerText = 'Sin actividad aún';
+        }
+
+        // Top Personajes Pinchados
+        const charMap = flattenObjectCounters(data, 'charClicks');
+        const sortedChars = Object.entries(charMap).sort((a, b) => b[1] - a[1]);
+        const charListEl = document.getElementById('statTopCharsList');
+        charListEl.innerHTML = sortedChars.length === 0
+          ? '<p class="text-gray-500 italic">Aún no hay clics registrados en personajes.</p>'
+          : sortedChars.map(([name, count], idx) => `
+              <div class="flex justify-between items-center bg-gray-900 px-3 py-1.5 rounded border border-gray-800">
+                <span class="font-semibold text-gray-200">${idx + 1}. ${name}</span>
+                <span class="font-mono font-bold text-purple-400">${count} clics</span>
+              </div>
+            `).join('');
+
+        // Top Vídeos de YouTube Visitados
+        const ytMap = flattenObjectCounters(data, 'ytClicks');
+        const sortedYt = Object.entries(ytMap).sort((a, b) => b[1] - a[1]);
+        const ytListEl = document.getElementById('statTopYtList');
+        ytListEl.innerHTML = sortedYt.length === 0
+          ? '<p class="text-gray-500 italic">Aún no se han abierto vídeos de YouTube.</p>'
+          : sortedYt.map(([name, count], idx) => `
+              <div class="flex justify-between items-center bg-gray-900 px-3 py-1.5 rounded border border-gray-800">
+                <span class="font-semibold text-gray-200">${idx + 1}. ${name}</span>
+                <span class="font-mono font-bold text-red-400">${count} visitas YT</span>
+              </div>
+            `).join('');
+
+        // Top Filtros Usados
+        const filterMap = flattenObjectCounters(data, 'filterUses');
+        const sortedFilters = Object.entries(filterMap).sort((a, b) => b[1] - a[1]);
+        const filterListEl = document.getElementById('statTopFiltersList');
+        filterListEl.innerHTML = sortedFilters.length === 0
+          ? '<span class="text-gray-500 italic">Aún no se han usado filtros.</span>'
+          : sortedFilters.map(([fName, count]) => `
+              <span class="bg-gray-900 border border-gray-700 px-2.5 py-1 rounded-lg text-gray-300">
+                <strong>${fName}:</strong> <span class="text-amber-400 font-mono font-bold">${count}</span>
+              </span>
+            `).join('');
+      });
+    }
+
+    function resetAnalyticsStats() {
+      if (!confirm('¿Seguro que quieres borrar todas las estadísticas de Prestigio y empezar desde cero?')) return;
+      statsDocRef.delete().then(() => {
+        loadAnalyticsData();
+      });
+    }
+
+    function handleSortChange(val) {
+      const labelMap = {
+        'cascade_r5a2': 'Todos (Cascada)',
+        'r5_a2': 'Rango 7★ R5 Asc 2',
+        'r5_a1': 'Rango 7★ R5 Asc 1',
+        'r5_base': 'Rango 7★ R5',
+        'r4_a2': 'Rango 7★ R4 Asc 2',
+        'r4_a1': 'Rango 7★ R4 Asc 1',
+        'r4_base': 'Rango 7★ R4'
+      };
+      trackEvent('filter_use', labelMap[val] || val);
+      renderPrestigeView();
+    }
+
+    // =========================================================================
+    // FUNCIONES PRINCIPALES DE LA APLICACIÓN
+    // =========================================================================
     function normalizeStr(s) {
       return (s || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
     }
@@ -780,6 +1027,7 @@
         setAdminMode(false);
       } else {
         setAdminMode(false);
+        trackEvent('visit');
       }
     });
 
@@ -832,6 +1080,7 @@
       const badge = document.getElementById('statusBadge');
       const btnAdd = document.getElementById('btnAddChar');
       const btnAutoFill = document.getElementById('btnAutoFillPrestige');
+      const btnAnalytics = document.getElementById('btnAnalytics');
       const btnAuth = document.getElementById('btnAdminAuth');
 
       if (isAdmin) {
@@ -839,12 +1088,14 @@
         badge.className = 'hidden sm:inline-block text-xs px-2.5 py-1 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-700';
         btnAdd.classList.remove('hidden');
         btnAutoFill.classList.remove('hidden');
+        btnAnalytics.classList.remove('hidden');
         btnAuth.innerText = 'Cerrar sesión';
       } else {
         badge.innerText = 'Modo Visitante';
         badge.className = 'hidden sm:inline-block text-xs px-2.5 py-1 rounded-full bg-gray-800 text-gray-400 border border-gray-700';
         btnAdd.classList.add('hidden');
         btnAutoFill.classList.add('hidden');
+        btnAnalytics.classList.add('hidden');
         btnAuth.innerText = '🔒 Acceso Admin';
       }
       renderPrestigeView();
@@ -944,7 +1195,11 @@
       const allBtn = document.createElement('button');
       allBtn.className = `px-3 py-1 rounded-lg text-xs font-bold border transition ${activePrestigeClass === 'ALL' ? 'bg-amber-500 text-black border-amber-400' : 'bg-gray-950 text-gray-400 border-gray-800 hover:text-white'}`;
       allBtn.innerText = 'Todas las Clases';
-      allBtn.onclick = () => { activePrestigeClass = 'ALL'; renderPrestigeView(); };
+      allBtn.onclick = () => {
+        activePrestigeClass = 'ALL';
+        trackEvent('filter_use', 'Clase: Todas');
+        renderPrestigeView();
+      };
       classBar.appendChild(allBtn);
 
       CLASES.forEach(cl => {
@@ -952,7 +1207,11 @@
         const active = activePrestigeClass === cl.id;
         btn.className = `px-3 py-1 rounded-lg text-xs font-bold border transition ${cl.headerStyle} ${active ? 'ring-2 ring-white opacity-100' : 'opacity-60 hover:opacity-100'}`;
         btn.innerText = cl.label;
-        btn.onclick = () => { activePrestigeClass = cl.id; renderPrestigeView(); };
+        btn.onclick = () => {
+          activePrestigeClass = cl.id;
+          trackEvent('filter_use', `Clase: ${cl.id}`);
+          renderPrestigeView();
+        };
         classBar.appendChild(btn);
       });
 
@@ -1107,6 +1366,8 @@
         document.getElementById('charName').value = ch.name;
         document.getElementById('charClass').value = ch.clase;
         document.getElementById('charImg').value = ch.img || '';
+        document.getElementById('charNotes').value = ch.notes || '';
+        document.getElementById('charYoutube').value = ch.youtube || '';
 
         const p = getCharPrestige(ch);
         document.getElementById('p_r5_a2').value = p.r5_a2 || '';
@@ -1134,6 +1395,8 @@
       const name = document.getElementById('charName').value.trim();
       const clase = document.getElementById('charClass').value;
       const img = document.getElementById('charImg').value.trim();
+      const notes = document.getElementById('charNotes').value.trim();
+      const youtube = document.getElementById('charYoutube').value.trim();
 
       let prestigeObj = {
         r5_a2:   Number(document.getElementById('p_r5_a2').value) || 0,
@@ -1153,7 +1416,7 @@
       if (editId) {
         const idx = characters.findIndex(c => c.id === editId);
         if (idx > -1) {
-          characters[idx] = { ...characters[idx], name, clase, img, prestige: prestigeObj };
+          characters[idx] = { ...characters[idx], name, clase, img, notes, youtube, prestige: prestigeObj };
         }
       } else {
         characters.push({
@@ -1166,8 +1429,8 @@
           tierTags: [],
           tags: [],
           gameTags: {},
-          notes: '',
-          youtube: '',
+          notes,
+          youtube,
           img
         });
       }
@@ -1177,9 +1440,19 @@
       renderPrestigeView();
     }
 
+    function getYoutubeId(url) {
+      if (!url) return null;
+      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|shorts\/)([^#\&\?]*).*/;
+      const match = url.match(regExp);
+      return (match && match[2].length === 11) ? match[2] : null;
+    }
+
     function openDetailModal(charId) {
       const ch = characters.find(c => c.id === charId);
       if (!ch) return;
+
+      // Registrar clic en el personaje para las analíticas
+      trackEvent('char_click', ch.name);
 
       document.getElementById('detailName').innerText = ch.name;
       document.getElementById('detailClassBadge').innerText = `Clase: ${ch.clase} | Tier: ${ch.tier === 'BENCH' ? 'Sin clasificar' : ch.tier}`;
@@ -1195,6 +1468,23 @@
         <div class="bg-gray-900 p-2 rounded border border-gray-800"><span class="text-gray-400 block text-[10px]">7★ R4 Asc 1 (x200)</span><strong class="text-purple-300 font-mono">${p.r4_a1 ? p.r4_a1.toLocaleString('es-ES') : '—'}</strong></div>
         <div class="bg-gray-900 p-2 rounded border border-gray-800"><span class="text-gray-400 block text-[10px]">7★ Rango 4 (x200)</span><strong class="text-sky-300 font-mono">${p.r4_base ? p.r4_base.toLocaleString('es-ES') : '—'}</strong></div>
       `;
+
+      // Mostrar vídeo de YouTube y registrar clic si el usuario pulsa para verlo
+      const videoSection = document.getElementById('detailVideoSection');
+      const ytBtn = document.getElementById('detailYoutubeBtn');
+      const ytThumb = document.getElementById('detailYoutubeThumb');
+      const ytId = getYoutubeId(ch.youtube);
+
+      if (ytId) {
+        ytThumb.src = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+        ytBtn.href = ch.youtube;
+        ytBtn.onclick = () => trackEvent('yt_click', ch.name);
+        videoSection.classList.remove('hidden');
+      } else {
+        ytBtn.href = "#";
+        ytBtn.onclick = null;
+        videoSection.classList.add('hidden');
+      }
 
       const imgEl = document.getElementById('detailImg');
       if (ch.img) {
